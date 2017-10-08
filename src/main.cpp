@@ -31,8 +31,9 @@ int main()
   uWS::Hub h;
 
   // Create a Kalman Filter instance
+  //cout <<"instancing fusionEKF\n";
   FusionEKF fusionEKF;
-
+  //cout <<"instanced fusionEKF\n";
   // used to compute the RMSE later
   Tools tools;
   vector<VectorXd> estimations;
@@ -106,8 +107,9 @@ int main()
     	  ground_truth.push_back(gt_values);
           
           //Call ProcessMeasurment(meas_package) for Kalman filter
+          //cout << "main calling ProcessMeasurement\n";
     	  fusionEKF.ProcessMeasurement(meas_package);    	  
-
+          //cout << "main returned from ProcessMeasurement\n";
     	  //Push the current estimated x,y positon from the Kalman filter's state vector
 
     	  VectorXd estimate(4);
@@ -123,20 +125,23 @@ int main()
     	  estimate(3) = v2;
     	  
     	  estimations.push_back(estimate);
-
+          //cout <<"main calling CalculateRMSE\n";
     	  VectorXd RMSE = tools.CalculateRMSE(estimations, ground_truth);
-
+          //cout <<"main returned from CalculateRMSE\n";
           json msgJson;
+          //cout <<"main initializing msgJson\n";
           msgJson["estimate_x"] = p_x;
           msgJson["estimate_y"] = p_y;
           msgJson["rmse_x"] =  RMSE(0);
           msgJson["rmse_y"] =  RMSE(1);
           msgJson["rmse_vx"] = RMSE(2);
           msgJson["rmse_vy"] = RMSE(3);
+          //cout <<"main initialized msgJson\n";
           auto msg = "42[\"estimate_marker\"," + msgJson.dump() + "]";
-          // std::cout << msg << std::endl;
+          //std::cout << msg << std::endl;
+          //cout <<"main calling ws.send\n";
           ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
-	  
+	  //cout <<"main returned from ws.send\n";
         }
       } else {
         
@@ -167,7 +172,7 @@ int main()
   });
 
   h.onDisconnection([&h](uWS::WebSocket<uWS::SERVER> ws, int code, char *message, size_t length) {
-    ws.close();
+    ws.close(); 
     std::cout << "Disconnected" << std::endl;
   });
 
